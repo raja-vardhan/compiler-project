@@ -1,0 +1,12 @@
+template<typename T>
+ostream& operator<<(ostream& out, const vector<T> &v){
+    out << "Size: " << v.size();
+    out << " [ ";
+    for(int i = 0; i < v.size(); i++){
+        out << v[i];
+        if(i != v.size() - 1)
+            out << ", ";
+    }
+    out << " ]" << endl;
+    return out;
+}

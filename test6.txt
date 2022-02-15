@@ -1,0 +1,16 @@
+/* int calcHeights(vector< vector<int> > &adjList, int root, int node, int p, vector<int> &height){
+    if((int)adjList[node].size() == 1 && node != root){
+        return 0;
+    }
+
+    int h = 0;
+    for(int i = 0; i < (int)adjList[node].size(); i++){
+        int n = adjList[node][i];
+        if(n != p)
+            h = max(h, calcHeights(adjList, root, n, node, height) + 1);
+    }
+
+    height[node] = h;
+
+    return h;
+} */
