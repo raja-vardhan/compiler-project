@@ -382,6 +382,10 @@ struct token getNextToken()
             c = getNextChar(s);
             if (c == '.')
                 state = 32;
+            else if (c == '0')
+                ;
+            else if(isPosNum(c))
+                {state = 31; s=c;}
             else
                 state = 37;
             break;
