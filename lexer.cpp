@@ -23,7 +23,7 @@ int CURRIDX = 0;
 vector<string> keywords{"int", "float", "boolean", "string", "while", "until", "if", "else if", "else", "true", "false"};
 
 /* 
-
+    Token names
 */
 enum TOKEN
 {
@@ -516,6 +516,7 @@ struct token getNextToken()
 
 /*
     Open file and store its contents in the string BUFFER.
+    Returns 1 on SUCCESS, 0 otherwise
 */
 int initFile()
 {
@@ -536,8 +537,17 @@ int initFile()
 int main(int argc, char *argv[])
 {
 
-    FILENAME = argv[1];
+    if(argc < 2){
+        cout << "Provide file as argument" << endl;
+        return 0;
+    }
+    else if(argc > 2){
+        cout << "Too many arguments" << endl;
+        return 0;
+    }
 
+    FILENAME = argv[1];
+    
     if(!initFile()){
         cout << "Couldn't open file" << endl;
         return 0;

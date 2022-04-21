@@ -1,0 +1,49 @@
+program : directives global funclist
+
+directives : '#include<' IDENTIFIER '>' directives | NULL
+
+global : declaration_statement global | assignment_statement global | NULL
+
+funclist : func funclist | NULL
+
+func : return_type funcname '(' argument_list ')' '{' statements '}'
+
+argument_list : type argument_name | type argument_name ',' argument_list | NULL
+
+type : INT | FLOAT
+
+return_type : type | VOID
+
+funcname : IDENTIFIER
+
+argument_name : IDENTIFIER
+
+statements : declaration_statement statements
+             | assignment_statement statements
+             | conditional_statement statements
+             | iteration_statement statements
+             | NULL
+
+declaration_statement : type variable_list ';'
+
+variable_list : variable | variable ',' variable_list
+
+assignment_statement : variable '=' expression ';'
+                     | variable '+=' expression ';'
+                     | variable '-=' expression ';' 
+                     | variable '*=' expression ';'
+                     | variable '/=' expression ';'
+
+conditional_statement : 'if' '(' expression ')' '{' statements '}'
+                      | 'if' '(' expression ')' '{' statements '}' else_if_list
+
+else_if_list : 'else' 'if' '(' expression ')' '{' statements '}' else_if_list
+                | 'else' '{' statements '}'
+                | NULL
+
+iteration_statement : for_loop | while_loop
+
+for_loop : 'for' '(' for_declaration_statement  expression ';' assignment_statement ')' '{' statements '}'
+
+for_declaration_statement : declaration_statement | NULL
+
