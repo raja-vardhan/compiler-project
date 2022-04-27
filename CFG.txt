@@ -28,22 +28,49 @@ declaration_statement : type variable_list ';'
 
 variable_list : variable | variable ',' variable_list
 
-assignment_statement : variable '=' expression ';'
+assignment_statement : variable ':=' expression ';'
                      | variable '+=' expression ';'
                      | variable '-=' expression ';' 
                      | variable '*=' expression ';'
                      | variable '/=' expression ';'
 
-conditional_statement : 'if' '(' expression ')' '{' statements '}'
-                      | 'if' '(' expression ')' '{' statements '}' else_if_list
+conditional_statement : 'if' '(' conditional_expression ')' '{' statements '}'
+                      | 'if' '(' conditional_expression ')' '{' statements '}' else_if_list
 
-else_if_list : 'else' 'if' '(' expression ')' '{' statements '}' else_if_list
+else_if_list : 'else' 'if' '(' conditional_expression ')' '{' statements '}' else_if_list
                 | 'else' '{' statements '}'
                 | NULL
 
 iteration_statement : for_loop | while_loop
 
-for_loop : 'for' '(' for_declaration_statement  expression ';' assignment_statement ')' '{' statements '}'
+for_loop : 'for' '(' for_declaration_statement  conditional_expression ';' assignment_statement ')' '{' statements '}'
 
-for_declaration_statement : declaration_statement | NULL
+for_declaration_statement : declaration_statement |  ';'
 
+while_loop : 'while' '(' conditional_expression ')' '{' statements '}'
+
+expression : arithmetic_expression
+           | logical_expression
+           | conditional_expression
+
+arithmetic_expression : arithmetic_expression '+' term
+                      | arithmetic_expression '-' term
+                      | term
+
+term : term '*' factor
+     | term '/' factor
+     | factor
+
+factor : ( arithmetic_expression )
+       | IDENTIFIER
+       | CONSTANT
+
+conditional_expression : arithmetic_expression compare arithmetic_expression
+                       | true
+                       | false
+
+compare : > | >= | = | < | <=
+
+logical_expression : logical_expression '&' logical_expression
+                   | logical_expression '|' logical_expression
+                   | conditional_expression 

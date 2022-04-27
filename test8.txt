@@ -1,0 +1,11 @@
+program -> funclist
+funclist > func
+func -> type name (argument_list) {statements}
+type -> int
+name -> IDENTIFIER
+argument_list -> ''
+statements -> declaration_statement
+declaration_statement -> type variable_list;
+type -> int
+variable_list -> variable
+variable -> IDENTIFIER

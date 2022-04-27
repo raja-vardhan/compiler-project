@@ -1,0 +1,85 @@
+program -> directives global funclist
+
+directives -> #include< IDENTIFIER > directives
+directives -> ''
+
+global -> declaration_statement global
+global -> assignment_statement global
+global -> ''
+
+funclist -> func funclist
+funclist -> ''
+
+func -> return_type funcname ( argument_list ) { statements }
+
+argument_list -> type argument_name
+argument_list -> type argument_name , argument_list
+argument_list -> ''
+
+type -> int
+type -> float
+
+return_type -> type
+return_type -> void
+
+funcname -> IDENTIFIER
+
+argument_name -> IDENTIFIER
+
+statements -> declaration_statement statements
+statements -> assignment_statement statements
+statements -> conditional_statement statements
+statements -> iteration_statement statements
+statements -> ''
+
+declaration_statement -> type variable_list ;
+
+variable_list -> variable 
+variable_list -> variable , variable_list
+
+assignment_statement -> variable := arithmetic_expression ;
+
+conditional_statement -> if ( conditional_expression ) { statements }
+conditional_statement -> if ( conditional_expression ) { statements } else { statements }
+
+iteration_statement -> for_loop
+iteration_statement -> while_loop
+
+for_loop -> for ( for_declaration_statement  conditional_expression ; assignment_statement ) { statements }
+
+for_declaration_statement -> declaration_statement
+for_declaration_statement -> ;
+
+while_loop -> while ( conditional_expression ) { statements }
+
+expression -> arithmetic_expression
+expression -> logical_expression
+expression -> conditional_expression
+
+arithmetic_expression -> arithmetic_expression + term
+arithmetic_expression -> arithmetic_expression - term
+arithmetic_expression -> term
+
+term -> term * factor
+term -> term / factor
+term -> factor
+
+factor -> ( arithmetic_expression )
+factor -> IDENTIFIER
+factor -> CONSTANT
+
+conditional_expression -> arithmetic_expression compare arithmetic_expression
+conditional_expression -> true
+conditional_expression -> false
+
+compare -> > 
+compare -> >= 
+compare -> =
+compare -> <
+compare -> <=
+
+logical_expression -> logical_expression & logical_expression
+logical_expression -> logical_expression | logical_expression
+logical_expression -> conditional_expression
+
+variable -> IDENTIFIER

@@ -1,0 +1,58 @@
+program -> funclist
+
+funclist -> func funclist
+funclist -> ''
+
+type -> int
+type -> float
+
+func -> type name ( argument_list ) { statements }
+
+argument_list -> type name
+argument_list -> type name , argument_list
+argument_list -> ''
+
+name -> IDENTIFIER
+
+statements -> declaration_statement statements
+statements -> assignment_statement statements
+statements -> conditional_statement statements
+statements -> iteration_statement statements
+statements -> ''
+
+declaration_statement -> type variable_list ;
+
+variable_list -> variable 
+variable_list -> variable , variable_list
+
+assignment_statement -> variable := arithmetic_expression ;
+
+conditional_statement -> if ( conditional_expression ) { statements }
+conditional_statement -> if ( conditional_expression ) { statements } else { statements }
+
+iteration_statement -> for_loop
+iteration_statement -> while_loop
+
+for_loop -> for ( declaration_statement  conditional_expression ; assignment_statement ) { statements }
+
+while_loop -> while ( conditional_expression ) { statements }
+
+expression -> arithmetic_expression
+expression -> conditional_expression
+
+arithmetic_expression -> arithmetic_expression + arithmetic_expression
+arithmetic_expression -> arithmetic_expression - arithmetic_expression
+arithmetic_expression -> arithmetic_expression * arithmetic_expression
+arithmetic_expression -> arithmetic_expression / arithmetic_expression
+arithmetic_expression -> IDENTIFIER
+arithmetic_expression -> CONSTANT
+
+conditional_expression -> arithmetic_expression compare arithmetic_expression
+
+compare -> > 
+compare -> >= 
+compare -> =
+compare -> <
+compare -> <=
+
+variable -> IDENTIFIER
