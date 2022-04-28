@@ -6,10 +6,27 @@
 
 using namespace std;
 
+struct tokenAttr{
+    string TYPE;
+    int VAL;
+
+    tokenAttr(){
+        TYPE = "";
+        VAL = -1;
+    }
+
+    tokenAttr(string t, int val){
+        TYPE = t;
+        VAL = val;
+    }
+};
+
 map< pair<int, string> , string> parseTable;
 stack<string> stk;
+stack<struct tokenAttr> semstk;
 vector< pair<string, int> > rules;
 queue<struct token> nextToken;
+map< string, pair<string, int> > symbolTable;
 
 void initParser(char* filename){
     if(initFile(filename) == 0){
@@ -478,7 +495,9 @@ void initParser(char* filename){
 int main(int argc, char* argv[]){
     initParser(argv[1]);
 
+    // Push state 0 onto stack
     stk.push("0");
+    semstk.push(tokenAttr("", -1));
 
     while(1){
         int currState = stoi(stk.top());
@@ -487,7 +506,7 @@ int main(int argc, char* argv[]){
             nextToken.push(getNextToken());
         }
         else{
-            struct token dol = {TEMP, "$", -1};
+            struct token dol = {TEMP, "$", "" ,-1};
             nextToken.push(dol);
         }
 
@@ -500,19 +519,48 @@ int main(int argc, char* argv[]){
 
         // cout << t.tokenStr << endl;
 
-        string oper = parseTable[{currState, t.tokenStr}];
+        string oper;
+        if(parseTable.count({currState, t.tokenStr}) == 0){
+            cout << "Parsing error" << endl;
+            return 0;
+        }
+        else{
+            oper = parseTable[{currState, t.tokenStr}];
+        }
         // cout << oper << endl;
         
         // Shift
         if(oper[0] == 's'){
 
-            // cout << t.tokenStr << endl;
-            // cout << oper.substr(1) << endl;
-
+            // Push input onto stack
             stk.push(t.tokenStr);
+            if(t.tokenStr == "int" 
+            || t.tokenStr == "float"
+            || t.tokenStr == ">"
+            || t.tokenStr == "<"
+            || t.tokenStr == "="
+            || t.tokenStr == "<="
+            || t.tokenStr == ">="
+            || t.tokenName == ID
+            || t.tokenName == INT
+            || t.tokenName == FLOAT){
+                semstk.push(tokenAttr(t.tokenStr, 0));
+                if(t.tokenName == ID){
+                    symbolTable[t.tokenStr] = {"", 0};
+                }
+                if(t.tokenName == INT){
+                    cout << t.value << endl;
+                    semstk.top().VAL = stoi(t.value);
+                }
+                if(t.tokenName == FLOAT){
+                    cout << t.value << endl;
+                    semstk.top().VAL = stof(t.value);
+                }
+            }
+
+            // Push new state onto stack
             stk.push(oper.substr(1));
             nextToken.pop();
-
         }
 
         // Reduce
@@ -520,10 +568,203 @@ int main(int argc, char* argv[]){
             int ruleNum = stoi(oper.substr(1));
             int numSym = rules[ruleNum].second;
             numSym *= 2;
+            tokenAttr temp = tokenAttr();
+            tokenAttr temp1;
+            tokenAttr temp2;
+            string s;
+            int val;
+
+            switch(ruleNum){
+
+                // type -> int   
+                // type.TYPE = INT    
+                // **SYN**
+                case 3:
+                    break;
+                
+                // type -> float  
+                // type.TYPE = FLOAT  
+                // **SYN**
+                case 4:
+                    break;
+
+                // func -> type name ( argument_list ) { statements }   
+                // func.TYPE = type.TYPE  
+                // **SYN**
+                case 5:
+                    for(int i = 0; i < 3; i++)
+                        semstk.pop();
+                    break;
+                
+                // argument_list -> type name    
+                // name.TYPE = type.TYPE   
+                // **INH**
+                case 6:
+                    temp = semstk.top();
+                    semstk.pop();
+                    temp.TYPE = semstk.top().TYPE;   // Use in ICG
+                    semstk.pop();
+                    semstk.push(tokenAttr("", -1));
+                    break;
+
+                // argument_list -> type name , argument_list   
+                // name.TYPE = type.TYPE    
+                // **INH**
+                case 7:
+                    semstk.pop();  // Pop argument_list
+                    temp = semstk.top();
+                    semstk.pop();
+                    temp.TYPE = semstk.top().TYPE;   // Use in ICG
+                    semstk.pop();
+                    semstk.push(tokenAttr("", -1));
+                    break;
+                
+                // name -> IDENTIFIER  
+                // name.VAL = IDENTIFIER.VAL   
+                // **SYN**
+                case 9:
+                    break;
+
+                // declaration_statement -> type variable_list ;  
+                // variable_list.TYPE = type.TYPE   
+                // **INH** 
+                case 15:
+                    temp = semstk.top();
+                    semstk.pop();
+                    temp.TYPE = semstk.top().TYPE;   // Use in ICG
+                    semstk.pop();
+                    semstk.push(tokenAttr("", -1));
+                    break;
+
+                // variable_list -> variable  
+                // variable.TYPE = variable_list.TYPE  
+                // **INH**
+                case 16:
+                    break;
+                
+                // variable_list -> variable , variable_list 
+                // variable_list(1).TYPE = variable.TYPE 
+                // **INH**
+                case 17:
+                    semstk.pop();
+                    break;
+
+                // assignment_statement -> variable := arithmetic_expression ;  
+                // variable.VAL = arithmetic_expression.VAL  
+                // **SYN**
+                case 18:
+                    break;
+
+                
+                // arithmetic_expression -> arithmetic_expression + arithmetic_expression
+                // ae.VAL = ae1.VAL + ae2.VAL 
+                // **SYN**
+                case 19:
+                    temp1 = semstk.top();
+                    semstk.pop();
+                    temp2 = semstk.top();
+                    semstk.pop();
+                    semstk.push(tokenAttr("", temp1.VAL + temp2.VAL));
+                
+                // arithmetic_expression -> arithmetic_expression - arithmetic_expression        
+                // ae.VAL = ae1.VAL - ae2.VAL 
+                // **SYN**
+                case 20:
+                    temp1 = semstk.top();
+                    semstk.pop();
+                    temp2 = semstk.top();
+                    semstk.pop();
+                    semstk.push(tokenAttr("", temp1.VAL - temp2.VAL));
+                    break;
+
+                // arithmetic_expression -> arithmetic_expression * arithmetic_expression       
+                // ae.VAL = ae1.VAL * ae2.VAL 
+                // **SYN**
+                case 21:
+                    temp1 = semstk.top();
+                    semstk.pop();
+                    temp2 = semstk.top();
+                    semstk.pop();
+                    semstk.push(tokenAttr("", temp1.VAL * temp2.VAL));
+                    break;
+
+                //arithmetic_expression -> arithmetic_expression / arithmetic_expression        
+                // ae.VAL = ae1.VAL / ae2.VAL 
+                // **SYN**
+                case 22:
+                    temp1 = semstk.top();
+                    semstk.pop();
+                    temp2 = semstk.top();
+                    semstk.pop();
+                    semstk.push(tokenAttr("", temp1.VAL / temp2.VAL));
+                    break;
+                
+                //arithmetic_expression -> IDENTIFIER    
+                // ae.VAL = IDENTIFIER.VAL **SYN**
+                case 23:
+                    break;
+
+                //arithmetic_expression -> CONSTANT      
+                // ae.VAL = CONSTANT.VAL   **SYN**
+                case 24:
+                    break;
+
+                // conditional_expression -> arithmetic_expression compare arithmetic_expression 
+                // ce.VAL = compare(ae1.VAL, ae2.VAL)
+                case 25:
+                    temp2 = semstk.top();  // ae2
+                    semstk.pop();
+            
+                    temp1 = semstk.top();  // compare
+                    s = temp1.TYPE;
+                    semstk.pop();
+                    temp1 = semstk.top();  // ae1
+                    semstk.pop();
+                    val = -1;
+                    if(s == "<")
+                        val = temp1.VAL < temp2.VAL;
+                    else if(s == ">")
+                        val = temp1.VAL > temp2.VAL;
+                    else if(s == "<=")
+                        val = temp1.VAL <= temp2.VAL;
+                    else if(s == ">=")
+                        val = temp1.VAL >= temp2.VAL;
+                    else if(s == "=")
+                        val = temp1.VAL == temp2.VAL;
+                    else{
+                        cout << "Error" << endl;;
+                        return 0;
+                    }
+                    semstk.push(tokenAttr("bool", val));
+                    break;
+                
+                // compare.TYPE = >
+                case 26:
+                    break;
+
+                // compare.TYPE = >=
+                case 27:
+                    break;
+
+                // compare.TYPE = =
+                case 28:
+                    break;
+
+                // compare.TYPE = <
+                case 29:
+                    break;
+
+                // compare.TYPE = <=
+                case 30:
+                    break;
+
+                // variable -> IDENTIFIER             
+                // variable.VAL = IDENTIFIER.VAL
+                case 31:
+                    break;
+            };
+
             for(int i = 0; i < numSym; i++){
-                // if(i & 1){
-                //     cout << stk.top() << endl;
-                // }
                 stk.pop();
             }
 

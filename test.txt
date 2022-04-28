@@ -1,6 +1,5 @@
 int main(){
-    int a;
-}
-
-int square(int x){
+    int a, b;
+    a := 10;
+    b := 20;
 }

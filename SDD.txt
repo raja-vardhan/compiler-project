@@ -1,0 +1,58 @@
+program -> funclist
+
+funclist -> func funclist
+funclist -> ''
+
+type -> int             // type.TYPE = INT    **SYN**
+type -> float           // type.TYPE = FLOAT  **SYN**
+
+func -> type name ( argument_list ) { statements }       // func.TYPE = type.TYPE  **SYN**
+
+argument_list -> type name                       // name.TYPE = type.TYPE          **INH**
+argument_list -> type name , argument_list       // name.TYPE = type.TYPE          **INH**
+argument_list -> ''
+
+name -> IDENTIFIER                               // name.VAL = IDENTIFIER.VAL   **SYN**
+
+statements -> declaration_statement statements
+statements -> assignment_statement statements
+statements -> conditional_statement statements
+statements -> iteration_statement statements
+statements -> ''
+
+declaration_statement -> type variable_list ;          // variable_list.TYPE = type.TYPE   **INH**
+
+variable_list -> variable                              // variable.TYPE = variable_list.TYPE   **INH**
+variable_list -> variable , variable_list              // variable_list(1).TYPE = variable_list.TYPE **INH**
+
+assignment_statement -> variable := arithmetic_expression ;       // variable.VAL = arithmetic_expression.VAL  **SYN**
+
+conditional_statement -> if ( conditional_expression ) { statements }
+conditional_statement -> if ( conditional_expression ) { statements } else { statements }
+
+iteration_statement -> for_loop
+iteration_statement -> while_loop
+
+for_loop -> for ( declaration_statement  conditional_expression ; assignment_statement ) { statements }
+
+while_loop -> while ( conditional_expression ) { statements }
+
+expression -> arithmetic_expression
+expression -> conditional_expression
+
+arithmetic_expression -> arithmetic_expression + arithmetic_expression        // ae.VAL = ae1.VAL + ae2.VAL **SYN**
+arithmetic_expression -> arithmetic_expression - arithmetic_expression        // ae.VAL = ae1.VAL - ae2.VAL **SYN**
+arithmetic_expression -> arithmetic_expression * arithmetic_expression        // ae.VAL = ae1.VAL * ae2.VAL **SYN**
+arithmetic_expression -> arithmetic_expression / arithmetic_expression        // ae.VAL = ae1.VAL / ae2.VAL **SYN**
+arithmetic_expression -> IDENTIFIER                                           // ae.VAL = IDENTIFIER.VAL **SYN**
+arithmetic_expression -> CONSTANT                                             // ae.VAL = CONSTANT.VAL   **SYN**
+
+conditional_expression -> arithmetic_expression compare arithmetic_expression // ce.VAL = compare(ae1.VAL, ae2.VAL)
+
+compare -> >            // compare.TYPE = >
+compare -> >=           // compare.TYPE = >=
+compare -> =            // compare.TYPE = =
+compare -> <            // compare.TYPE = <
+compare -> <=           // compare.TYPE = <=
+
+variable -> IDENTIFIER             // variable.VAL = IDENTIFIER.VAL

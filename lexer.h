@@ -66,6 +66,7 @@ struct token
 {
     enum TOKEN tokenName;
     string tokenStr;
+    string value;
     int offset;
 };
 
@@ -117,7 +118,7 @@ struct token getNextToken()
     int error = 0;
     string s = "";
     int c = -1;
-    struct token t = {USELESS, "" ,-1};
+    struct token t = {USELESS, "" , "" , -1};
     while ((!final) && (CURRIDX <= (int)BUFFER.size()))
     {
 
@@ -404,6 +405,7 @@ struct token getNextToken()
             final = 1;
             t.tokenName = FLOAT;
             t.tokenStr = "CONSTANT";
+            t.value = s;
             if (CURRIDX < (int)BUFFER.size())
                 retract(s);
             break;
@@ -411,6 +413,7 @@ struct token getNextToken()
             final = 1;
             t.tokenName = INT;
             t.tokenStr = "CONSTANT";
+            t.value = s;
             if (CURRIDX < (int)BUFFER.size())
                 retract(s);
             break;
@@ -425,6 +428,7 @@ struct token getNextToken()
             final = 1;
             t.tokenName = INT;
             t.tokenStr = "CONSTANT";
+            t.value = s;
             if (CURRIDX < (int)BUFFER.size())
                 retract(s);
             break;
